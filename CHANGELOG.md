@@ -4,6 +4,15 @@
 
 ---
 
+## [v2.0.7] - 2026-06-18
+### 수정 (Fixed)
+- **Playwright 크롤러 아카마이(Akamai) 방화벽 봇 탐지 우회 및 차단 정밀 진단**:
+  - `crawler_service.py`에 데스크톱 크롬과 동일한 User-Agent 및 HTTP 헤더 자동 전달 설정 보강.
+  - `--disable-blink-features=AutomationControlled` 등의 브라우저 실행 옵션을 주어 자동화 탐지 플래그(`navigator.webdriver`) 숨김.
+  - 접속 차단 시 HTTP 403 Forbidden 상태 코드 및 "Access Denied" 본문 문구를 정밀 추적하여, 단순 결과 없음 대신 "보안 차단됨 (Akamai 방화벽)" 상세 상태를 반환하도록 고도화.
+
+---
+
 ## [v2.0.6] - 2026-06-18
 ### 수정 (Fixed)
 - **Linux X11 공유 라이브러리 누락으로 인한 Playwright 크롤러 크래시 핫픽스**:

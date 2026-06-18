@@ -8,12 +8,37 @@ def crawl_single_part_sync(page, part_number):
     url = f"https://kr.misumi-ec.com/vona2/result/?Keyword={part_number}"
     
     try:
-        page.goto(url, wait_until="domcontentloaded", timeout=20000)
+        response = page.goto(url, wait_until="domcontentloaded", timeout=20000)
+        
+        # HTTP 상태 코드 검사 (403 Forbidden 등 탐지)
+        if response and response.status in [403, 401, 503]:
+            return {
+                "검색 품번": part_number,
+                "매칭 여부": f"보안 차단됨 ({response.status} Forbidden - Akamai 방화벽)",
+                "실제 품번": "-",
+                "품명/설명": "-",
+                "브랜드": "-",
+                "가격": "-",
+                "출하일": "-"
+            }
+            
         # Wait for AJAX results to load
         page.wait_for_timeout(6000)
         
-        # Check if the page displays a "No results found" pattern
+        # Check if the page displays a "No results found" or "Access Denied" pattern
         body_text = page.inner_text("body")
+        
+        if "Access Denied" in body_text or "Reference #" in body_text or "you don't have permission to access" in body_text:
+            return {
+                "검색 품번": part_number,
+                "매칭 여부": "보안 차단됨 (Access Denied - Akamai 방화벽)",
+                "실제 품번": "-",
+                "품명/설명": "-",
+                "브랜드": "-",
+                "가격": "-",
+                "출하일": "-"
+            }
+            
         if "검색하신 정보를 찾을 수 없습니다" in body_text or "일치하는 상품이 없습니다" in body_text or "정보를 찾지 못했습니다" in body_text:
             return {
                 "검색 품번": part_number,
@@ -125,27 +150,45 @@ def crawl_parts_service_sync(part_numbers, callback=None):
         is_streamlit_cloud = os.environ.get("STREAMLIT_SERVER") or os.name != "nt"
         headless = True if is_streamlit_cloud else False
         
+        launch_args = [
+            "--disable-blink-features=AutomationControlled",
+            "--no-sandbox",
+            "--disable-setuid-sandbox"
+        ]
+        
         try:
             if is_streamlit_cloud:
                 # 리눅스 컨테이너 서버에서는 채널 지정 없이 헤드리스 크로미움 실행
-                browser = p.chromium.launch(headless=True)
+                browser = p.chromium.launch(headless=True, args=launch_args)
             else:
                 # 로컬(Windows 등)에서는 기존 방식대로 Chrome 채널 및 헤드풀 실행
-                browser = p.chromium.launch(channel="chrome", headless=headless)
+                browser = p.chromium.launch(channel="chrome", headless=headless, args=launch_args)
         except Exception as e:
             # 실패 시 일반 크로미움 헤드리스로 폴백 실행
             try:
-                browser = p.chromium.launch(headless=True)
+                browser = p.chromium.launch(headless=True, args=launch_args)
             except Exception as e2:
                 raise RuntimeError(
                     f"브라우저 실행 실패. Playwright 크로미움 다운로드가 필요할 수 있습니다. "
                     f"(에러1: {e}, 에러2: {e2})"
                 )
                 
+        # 실제 데스크톱 크롬과 동일한 User-Agent 정보 추가
+        chrome_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        
         context = browser.new_context(
             viewport={"width": 1920, "height": 1080},
             locale="ko-KR",
             timezone_id="Asia/Seoul",
+            user_agent=chrome_user_agent,
+            extra_http_headers={
+                "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                "Sec-Ch-Ua": '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+                "Sec-Ch-Ua-Mobile": "?0",
+                "Sec-Ch-Ua-Platform": '"Windows"',
+                "Upgrade-Insecure-Requests": "1"
+            }
         )
         page = context.new_page()
         
