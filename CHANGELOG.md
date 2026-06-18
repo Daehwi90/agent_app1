@@ -4,6 +4,14 @@
 
 ---
 
+## [v2.0.5] - 2026-06-18
+### 수정 (Fixed)
+- **Streamlit Community Cloud APT 패키지 충돌 에러 핫픽스**:
+  - `packages.txt`에서 구형 리눅스 패키지인 `libglib2.0-0` 제거.
+  - 최신 Debian trixie 환경에서 `libglib2.0-0t64`와의 버전 충돌을 없애고 패키지 매니저가 자동으로 최신 규격 라이브러리를 설치하도록 해결.
+
+---
+
 ## [v2.0.4] - 2026-06-18
 ### 수정 (Fixed)
 - **Streamlit Community Cloud 배포 시 Requirements 설치 에러 핫픽스**:
