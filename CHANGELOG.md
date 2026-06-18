@@ -4,6 +4,14 @@
 
 ---
 
+## [v2.0.3] - 2026-06-18
+### 수정 (Fixed)
+- **Linux OS 공유 라이브러리 누락으로 인한 Playwright 크롤러 크래시 핫픽스**:
+  - Streamlit Community Cloud(리눅스 서버) 빌드 단계에서 필수 시스템 패키지들을 자동 설치하도록 프로젝트 루트에 `packages.txt` 생성.
+  - `libglib2.0-0`, `libnss3`, `libnspr4`, `libgbm1`, `libasound2` 등의 GUI/브라우저 구동용 종속 패키지들을 선언하여 환경 구성 문제를 완전 해결.
+
+---
+
 ## [v2.0.2] - 2026-06-18
 ### 수정 (Fixed)
 - **Playwright 브라우저 자동 다운로더 오류 수정**:
