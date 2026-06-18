@@ -1,0 +1,22 @@
+# Python virtual environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python caching
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# HuggingFace & local embedding model caches
+.cache/
+
+# Streamlit configurations (if containing secrets)
+.streamlit/secrets.toml
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
