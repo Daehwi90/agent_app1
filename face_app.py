@@ -176,7 +176,44 @@ custom_css = """
         font-size: 0.9rem;
         color: #94A3B8;
     }
+
+    /* Responsive Design (Media Queries) */
+    @media (max-width: 768px) {
+        .header-container {
+            padding: 1.5rem 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .header-title {
+            font-size: 1.8rem !important;
+        }
+        .header-subtitle {
+            font-size: 0.95rem !important;
+        }
+        .upload-card {
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        .report-card {
+            padding: 1.25rem;
+        }
+        .score-value {
+            font-size: 2.5rem;
+        }
+        .badge-match, .badge-mismatch, .badge-uncertain {
+            font-size: 0.9rem;
+            padding: 0.4rem 1rem;
+        }
+        .feature-table th, .feature-table td {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.85rem;
+        }
+        .feature-name {
+            font-size: 0.85rem;
+            white-space: normal;
+        }
+    }
 </style>
+
 """
 st.markdown(custom_css, unsafe_allow_html=True)
 
@@ -402,19 +439,22 @@ if run_analysis:
                     """
                 
                 table_html = f"""
-                <table class="feature-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 25%;">분석 영역</th>
-                            <th>상세 대조 분석 결과 (Forensic Analysis Details)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {table_rows}
-                    </tbody>
-                </table>
+                <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                    <table class="feature-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">분석 영역</th>
+                                <th>상세 대조 분석 결과 (Forensic Analysis Details)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {table_rows}
+                        </tbody>
+                    </table>
+                </div>
                 """
                 st.markdown(table_html, unsafe_allow_html=True)
+
                 
                 st.markdown('</div>', unsafe_allow_html=True)
                 
