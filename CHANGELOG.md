@@ -4,6 +4,14 @@
 
 ---
 
+## [v2.0.6] - 2026-06-18
+### 수정 (Fixed)
+- **Linux X11 공유 라이브러리 누락으로 인한 Playwright 크롤러 크래시 핫픽스**:
+  - `packages.txt`에 X11 윈도우 그래픽 및 렌더링용 필수 패키지 보충 (`libxfixes3`, `libxext6`, `libxrender1`, `libx11-6`, `libx11-xcb1`, `libxcb1`, `libxcursor1`, `libxi6`, `libxtst6`).
+  - Chromium 구동 환경에서 발생할 수 있는 모든 그래픽 종속성 관련 예외 사전 방지 조치.
+
+---
+
 ## [v2.0.5] - 2026-06-18
 ### 수정 (Fixed)
 - **Streamlit Community Cloud APT 패키지 충돌 에러 핫픽스**:
