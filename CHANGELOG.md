@@ -4,6 +4,15 @@
 
 ---
 
+## [v2.0.2] - 2026-06-18
+### 수정 (Fixed)
+- **Playwright 브라우저 자동 다운로더 오류 수정**:
+  - Linux 기반 Streamlit Cloud 환경에서 `python` 명령어를 찾지 못해 생기던 핫픽스 오류 해결.
+  - `sys.executable`을 사용하여 실제 실행 중인 파이썬 인터프리터 경로를 직접 지정해 `playwright install chromium`이 올바르게 실행되도록 개선.
+  - 설치 실패 시 `raise e`를 적용해 잘못된 설치 상태가 `@st.cache_resource`에 캐싱되어 재시도를 막는 문제 해결.
+
+---
+
 ## [v2.0.1] - 2026-06-18
 ### 수정 (Fixed)
 - **Streamlit Community Cloud 환경에서 Playwright 크로미움 브라우저 에러 핫픽스**:
