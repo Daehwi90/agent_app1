@@ -315,9 +315,9 @@ def get_cached_embeddings(chunks, search_method, api_provider, api_key=None):
     # 새로운 임베딩 생성 진행
     texts = [c["text"] for c in chunks]
     
-    if search_method == "🧠 로컬 벡터 검색 (Sentence-Transformers)":
+    if search_method.startswith("🧠 로컬 벡터 검색"):
         if not HAS_SENTENCE_TRANSFORMERS:
-            st.error("⚠️ sentence-transformers 패키지가 설치되어 있지 않아 로컬 벡터 검색을 수행할 수 없습니다.")
+            st.error("⚠️ 이 환경(Streamlit Cloud)에서는 서버 메모리 한계로 인해 로컬 벡터 검색이 비활성화되었습니다. API 임베딩 검색 또는 TF-IDF 검색을 선택해 주세요.")
             return None
         with st.spinner("로컬 임베딩 모델(all-MiniLM-L6-v2)을 로드하고 문서 벡터를 추출하는 중... (최초 1회 실행)"):
             try:
@@ -354,7 +354,7 @@ def search_documents(query, chunks, search_method, api_provider, api_key=None, t
         return []
         
     # 1. 키워드 검색 (TF-IDF)
-    if search_method == "🔍 키워드 검색 (TF-IDF)":
+    if search_method.startswith("🔍 키워드 검색"):
         texts = [c["text"] for c in chunks]
         vectorizer = TfidfVectorizer()
         tfidf_matrix = vectorizer.fit_transform(texts)
@@ -382,7 +382,7 @@ def search_documents(query, chunks, search_method, api_provider, api_key=None, t
         
     # 질문(Query) 임베딩 벡터 구하기
     query_emb = None
-    if search_method == "🧠 로컬 벡터 검색 (Sentence-Transformers)":
+    if search_method.startswith("🧠 로컬 벡터 검색"):
         try:
             model = load_local_embedding_model()
             query_emb = model.encode([query])[0]
@@ -592,15 +592,18 @@ with st.sidebar:
     
     # (3) 고급 설정 (토글 가능하게 확장)
     with st.expander("⚙️ 검색 상세 설정"):
+        search_options = ["🔍 키워드 검색 (TF-IDF)"]
+        if HAS_SENTENCE_TRANSFORMERS:
+            search_options.append("🧠 로컬 벡터 검색 (Sentence-Transformers)")
+        else:
+            search_options.append("🧠 로컬 벡터 검색 (Sentence-Transformers) - 미지원")
+        search_options.append("⚡ API 임베딩 검색 (Gemini / OpenAI)")
+        
         search_method = st.radio(
             "검색 방식 선택",
-            [
-                "🔍 키워드 검색 (TF-IDF)",
-                "🧠 로컬 벡터 검색 (Sentence-Transformers)",
-                "⚡ API 임베딩 검색 (Gemini / OpenAI)"
-            ],
+            search_options,
             index=0,
-            help="로컬 벡터 검색은 설치 시 다운로드 등으로 시간이 소요될 수 있으며 의미 중심 검색이 가능합니다. API 임베딩은 API 키가 설정되어 있어야 합니다."
+            help="로컬 벡터 검색은 로컬 컴퓨터의 메모리가 충분할 때 가동 가능합니다. API 임베딩은 외부 서버를 활용하므로 메모리 걱정 없이 배포 서버에서도 가장 정밀한 벡터 검색을 보장합니다."
         )
         chunk_size = st.slider("청크 크기 (글자 수)", min_value=200, max_value=2000, value=600, step=100)
         chunk_overlap = st.slider("청크 중복 크기 (글자 수)", min_value=50, max_value=500, value=150, step=50)
