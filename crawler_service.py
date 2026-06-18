@@ -116,12 +116,32 @@ def crawl_parts_service_sync(part_numbers, callback=None):
     Crawls a list of part numbers sequentially (Synchronously).
     callback: function that receives (index, total_count, result_dict)
     """
+    import os
     results = []
     total = len(part_numbers)
     
     with sync_playwright() as p:
-        # Launch system Chrome in headful mode to bypass Akamai block
-        browser = p.chromium.launch(channel="chrome", headless=False)
+        # Streamlit Cloud (Linux) 및 GUI가 없는 환경인지 감지
+        is_streamlit_cloud = os.environ.get("STREAMLIT_SERVER") or os.name != "nt"
+        headless = True if is_streamlit_cloud else False
+        
+        try:
+            if is_streamlit_cloud:
+                # 리눅스 컨테이너 서버에서는 채널 지정 없이 헤드리스 크로미움 실행
+                browser = p.chromium.launch(headless=True)
+            else:
+                # 로컬(Windows 등)에서는 기존 방식대로 Chrome 채널 및 헤드풀 실행
+                browser = p.chromium.launch(channel="chrome", headless=headless)
+        except Exception as e:
+            # 실패 시 일반 크로미움 헤드리스로 폴백 실행
+            try:
+                browser = p.chromium.launch(headless=True)
+            except Exception as e2:
+                raise RuntimeError(
+                    f"브라우저 실행 실패. Playwright 크로미움 다운로드가 필요할 수 있습니다. "
+                    f"(에러1: {e}, 에러2: {e2})"
+                )
+                
         context = browser.new_context(
             viewport={"width": 1920, "height": 1080},
             locale="ko-KR",

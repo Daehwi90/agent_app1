@@ -4,6 +4,14 @@
 
 ---
 
+## [v2.0.1] - 2026-06-18
+### 수정 (Fixed)
+- **Streamlit Community Cloud 환경에서 Playwright 크로미움 브라우저 에러 핫픽스**:
+  - `app.py`에 `@st.cache_resource` 기반으로 서버 시작 시 `playwright install chromium`을 1회 백그라운드 자동 실행해 주는 초기화 함수 추가.
+  - `crawler_service.py`에서 로컬(Windows)과 서버(Linux) 환경을 감지하여, 리눅스 서버 환경에서는 화면 출력 없는 헤드리스 모드(`headless=True`) 및 채널 없는 일반 `chromium`으로 자동 런칭 및 폴백하도록 조치.
+
+---
+
 ## [v2.0.0] - 2026-06-18
 ### 추가 (Added)
 - **다차원 벡터 검색 기능**:

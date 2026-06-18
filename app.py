@@ -9,11 +9,27 @@ from openai import OpenAI
 import pandas as pd
 import io
 from crawler_service import crawl_parts_service_sync
+import subprocess
+import os
 try:
     from sentence_transformers import SentenceTransformer
     HAS_SENTENCE_TRANSFORMERS = True
 except ImportError:
     HAS_SENTENCE_TRANSFORMERS = False
+
+@st.cache_resource
+def ensure_playwright_browsers():
+    """Streamlit Community Cloud 서버 환경에서 Playwright 크로미움 브라우저 바이너리를 자동 다운로드합니다."""
+    is_streamlit_cloud = os.environ.get("STREAMLIT_SERVER") or os.name != "nt"
+    if is_streamlit_cloud:
+        try:
+            # playwright install chromium 실행
+            subprocess.run(["python", "-m", "playwright", "install", "chromium"], check=True)
+        except Exception as e:
+            st.error(f"⚠️ Playwright 브라우저 자동 설치 중 오류 발생: {e}")
+
+# 서버 시작 시 1회 자동 실행 (캐싱 적용)
+ensure_playwright_browsers()
 
 # -----------------------------------------------------------------------------
 # 1. PAGE CONFIGURATION & STYLING
