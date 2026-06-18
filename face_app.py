@@ -180,19 +180,54 @@ custom_css = """
     /* Responsive Design (Media Queries) */
     @media (max-width: 768px) {
         .header-container {
-            padding: 1.5rem 1rem;
-            margin-bottom: 1.5rem;
+            padding: 1rem 0.5rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
         }
         .header-title {
-            font-size: 1.8rem !important;
+            font-size: 1.5rem !important;
+            margin-bottom: 0px !important;
         }
         .header-subtitle {
-            font-size: 0.95rem !important;
+            display: none; /* 모바일에서는 부제목을 숨겨 화면 공간 절약 */
         }
+        
+        /* Force two upload columns to stay side-by-side on mobile */
+        div[data-testid="stHorizontalBlock"]:has(.upload-card) {
+            flex-direction: row !important;
+            gap: 0.5rem !important;
+        }
+        div[data-testid="stHorizontalBlock"]:has(.upload-card) > div[data-testid="column"] {
+            width: calc(50% - 0.25rem) !important;
+            flex: 1 1 calc(50% - 0.25rem) !important;
+            min-width: calc(50% - 0.25rem) !important;
+        }
+        
+        /* Restrict uploaded image height on mobile to prevent excessive scrolling */
+        div[data-testid="stImage"] img {
+            max-height: 120px !important;
+            width: auto !important;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+        
         .upload-card {
-            padding: 1rem;
-            margin-bottom: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
         }
+        .upload-card h4 {
+            font-size: 0.95rem !important;
+            margin-bottom: 0.25rem !important;
+        }
+        
+        /* Make file uploader extremely compact on mobile */
+        div[data-testid="stFileUploader"] {
+            padding: 0.1rem 0rem;
+        }
+        div[data-testid="stFileUploader"] section {
+            padding: 0.5rem !important;
+        }
+        
         .report-card {
             padding: 1.25rem;
         }
@@ -213,6 +248,7 @@ custom_css = """
         }
     }
 </style>
+
 
 """
 st.markdown(custom_css, unsafe_allow_html=True)
